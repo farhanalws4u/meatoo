@@ -12,9 +12,9 @@ app.use(cors());
 app.use("/user", userRoutes);
 
 const MONGO_URI =
-  "mongodb+srv://farhan:Farhan21@db@memoriesproject.v4pv3.mongodb.net/memoriesProject?retryWrites=true&w=majority";
+  "mongodb+srv://admin:Admin@db@clusterone.apldt.mongodb.net/clusterOne?retryWrites=true&w=majority";
 
-//    "mongodb+srv://admin:Admin@db@clusterone.apldt.mongodb.net/clusterOne?retryWrites=true&w=majority";
+// "mongodb+srv://farhan:Farhan21@db@memoriesproject.v4pv3.mongodb.net/memoriesProject?retryWrites=true&w=majority";
 
 const PORT = process.env.PORT || 5000;
 

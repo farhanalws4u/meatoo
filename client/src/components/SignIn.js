@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
+import { auth, getUserDocument } from "../firebase/index";
 import { Link } from "@react-navigation/native";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
@@ -43,8 +44,20 @@ export default function App() {
     setFormData({ ...formData, [inputName]: value });
   };
 
-  const handleSubmit = () => {
-    // console.log(formData);
+  const handleSubmit = async () => {
+    try {
+      const { user } = await auth.signInWithEmailAndPassword(
+        formData.email.trim(),
+        formData.password
+      );
+
+      const currentUser = await getUserDocument(user.uid);
+
+      console.log(currentUser);
+    } catch (e) {
+      console.log(e);
+      Alert.alert("Oops", e.message);
+    }
   };
 
   return (

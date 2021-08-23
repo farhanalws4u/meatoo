@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { StyleSheet } from "react-native";
+import { auth, generateUserDocument } from "../firebase/index";
+import { Alert, StyleSheet } from "react-native";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import CustomButton from "./CustomButton";
@@ -13,7 +14,6 @@ import {
   FormControl,
   Input,
 } from "native-base";
-import { signUp } from "../actions/auth";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -34,8 +34,22 @@ export default function App() {
     setFormData({ ...formData, [inputName]: value });
   };
 
-  const handleSubmit = () => {
-    dispatch(signUp(formData, navigation));
+  const handleSubmit = async () => {
+    if (formData.password !== formData.confirmPassword) {
+      return Alert.alert("Oops", "passwords doesn't match.");
+    }
+    try {
+      const { user } = await auth.createUserWithEmailAndPassword(
+        formData.email,
+        formData.password
+      );
+
+      const currentUser = await generateUserDocument(user, formData);
+
+      console.log(currentUser);
+    } catch (e) {
+      Alert.alert("Oops", e.message);
+    }
   };
 
   let loadingFonts = () => {
@@ -82,6 +96,7 @@ export default function App() {
               Full Name
             </FormControl.Label>
             <Input
+              isRequired={true}
               type="text"
               variant="underlined"
               style={styles.input}
@@ -103,7 +118,8 @@ export default function App() {
               Email
             </FormControl.Label>
             <Input
-              type="text"
+              isRequired={true}
+              type="email"
               variant="underlined"
               style={styles.input}
               name="email"
@@ -124,6 +140,7 @@ export default function App() {
               Password
             </FormControl.Label>
             <Input
+              isRequired={true}
               type="password"
               variant="underlined"
               style={styles.input}
@@ -145,6 +162,7 @@ export default function App() {
               Confirm Password
             </FormControl.Label>
             <Input
+              isRequired={true}
               type="password"
               variant="underlined"
               style={styles.input}
