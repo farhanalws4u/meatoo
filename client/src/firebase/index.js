@@ -11,7 +11,11 @@ var firebaseConfig = {
   measurementId: Constants.manifest.extra.measurementId,
 };
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+} else {
+  firebase.app(); // if already initialized, use that one
+}
 
 export const auth = firebase.auth();
 
@@ -22,7 +26,8 @@ export const db = firebase.firestore();
 export const generateUserDocument = async (user, formData) => {
   if (!user) return;
   // const userRef = db.doc(`users/${user.uid}`);
-  const userRef = db.collection("users").doc(user.uid);
+  const userRef = db.collection("users").doc(user.uid || user.id);
+
   const snapshot = await userRef.get();
   if (!snapshot.exists) {
     const { email } = user;
@@ -36,17 +41,20 @@ export const generateUserDocument = async (user, formData) => {
       console.error("Error creating user document", error);
     }
   }
-  return getUserDocument(user.uid);
+
+  return getUserDocument(user.uid, user.id);
 };
 
-// getting the user document....
+// getting user document....
 
-export const getUserDocument = async (uid) => {
-  if (!uid) return null;
+export const getUserDocument = async (uid, id) => {
+  if (!uid && !id) return null;
   try {
-    const userDocument = await db.doc(`users/${uid}`).get();
+    const userDocument = await db.doc(`users/${uid || id}`).get();
+    let userId = null;
+    uid ? (userId = uid) : (userId = id);
     return {
-      uid,
+      userId: userId,
       ...userDocument.data(),
     };
   } catch (error) {

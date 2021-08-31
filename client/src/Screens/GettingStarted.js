@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { generateUserDocument, db } from "../firebase/index";
 import {
   StyleSheet,
   View,
@@ -6,6 +7,7 @@ import {
   Text,
   Platform,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
@@ -37,9 +39,9 @@ export default function GettingStarted() {
     );
   }
 
-  // id for meatoo from farhanoffcial account
+  // id for meatoo-b9a48 from farhanoffcial account
   const clientId =
-    "286431085823-3as8armea9ckqgadhj1n3e86erg9la9r.apps.googleusercontent.com";
+    "572103482905-fge8nervgol67oj1oapbcvfqhsp1pv2i.apps.googleusercontent.com";
 
   async function signInWithGoogleAsync() {
     try {
@@ -51,13 +53,20 @@ export default function GettingStarted() {
       });
 
       if (result.type === "success") {
-        console.log(result.user);
+        const currentUser = await generateUserDocument(result.user, {
+          email: result.user.email,
+          fullName: result.user.name,
+          ...result.user,
+        });
+        console.log(currentUser);
+
         // navigation.navigate('profile',{result.user,result.accesToken})
       } else {
         return { cancelled: true };
       }
     } catch (e) {
-      console.log(e.message);
+      console.log(e);
+      Alert.alert("Oops", e.message);
     }
   }
 
